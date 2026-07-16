@@ -795,7 +795,8 @@ public:
     addToonSpecularLobes(moonray::shading::BsdfBuilder &builder,
                          const ispc::ToonSpecularParameters &params,
                          const int label,
-                         const scene_rdl2::rdl2::LightSet* lightSet)
+                         const scene_rdl2::rdl2::LightSet* lightSet,
+                         const moonray::shading::Iridescence * iridescence = nullptr)
     {
         const moonray::shading::ToonSpecularBRDF toonSpecularBRDF(
                 scene_rdl2::math::asCpp(params.mNormal),
@@ -813,7 +814,8 @@ public:
                 scene_rdl2::math::asCpp(params.mdPdt),
                 params.mEnableIndirectReflections,
                 params.mIndirectReflectionsIntensity,
-                params.mIndirectReflectionsRoughness);
+                params.mIndirectReflectionsRoughness,
+                iridescence);
 
         builder.addToonSpecularBRDF(
                 toonSpecularBRDF,
@@ -827,7 +829,8 @@ public:
     addHairToonSpecularLobes(moonray::shading::BsdfBuilder &builder,
                          const ispc::ToonSpecularParameters &params,
                          const ispc::DwaBaseLabels &labels,
-                         const scene_rdl2::rdl2::LightSet* lightSet)
+                         const scene_rdl2::rdl2::LightSet* lightSet,
+                         const moonray::shading::Iridescence * iridescence = nullptr)
     {
         const moonray::shading::HairToonSpecularBRDF hairToonSpecularBRDF(
                 scene_rdl2::math::asCpp(params.mNormal),
@@ -846,7 +849,8 @@ public:
                 params.mRampValues,
                 params.mEnableIndirectReflections,
                 params.mIndirectReflectionsIntensity,
-                params.mIndirectReflectionsRoughness);
+                params.mIndirectReflectionsRoughness,
+                iridescence);
 
         builder.addHairToonSpecularBRDF(
                 hairToonSpecularBRDF,

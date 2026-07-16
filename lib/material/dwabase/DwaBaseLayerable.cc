@@ -254,12 +254,14 @@ DwaBaseLayerable::createLobes(const DwaBaseLayerable * const dwaBaseLayerable,
             addToonSpecularLobes(builder,
                                  params.mHairToonS1Params,
                                  labels.mHairLabels.mHair,
-                                 specularLightSet);
+                                 specularLightSet,
+                                 primaryIridescence);
         } else if (uParams.mHairToonS1Model == ispc::ToonSpecularModel::ToonSpecularHair) {
             addHairToonSpecularLobes(builder,
                                      params.mHairToonS1Params,
                                      labels,
-                                     specularLightSet);
+                                     specularLightSet,
+                                     primaryIridescence);
         }
     }
 
@@ -269,12 +271,14 @@ DwaBaseLayerable::createLobes(const DwaBaseLayerable * const dwaBaseLayerable,
             addToonSpecularLobes(builder,
                                  params.mHairToonS2Params,
                                  labels.mHairLabels.mHair,
-                                 specularLightSet);
+                                 specularLightSet,
+                                 primaryIridescence);
         } else if (uParams.mHairToonS2Model == ispc::ToonSpecularModel::ToonSpecularHair) {
             addHairToonSpecularLobes(builder,
                                      params.mHairToonS2Params,
                                      labels,
-                                     specularLightSet);
+                                     specularLightSet,
+                                     primaryIridescence);
         }
     }
 
@@ -284,12 +288,14 @@ DwaBaseLayerable::createLobes(const DwaBaseLayerable * const dwaBaseLayerable,
             addToonSpecularLobes(builder,
                                  params.mHairToonS3Params,
                                  labels.mHairLabels.mHair,
-                                 specularLightSet);
+                                 specularLightSet,
+                                 primaryIridescence);
         } else if (uParams.mHairToonS3Model == ispc::ToonSpecularModel::ToonSpecularHair) {
             addHairToonSpecularLobes(builder,
                                      params.mHairToonS3Params,
                                      labels,
-                                     specularLightSet);
+                                     specularLightSet,
+                                     primaryIridescence);
         }
     }
 
@@ -402,7 +408,8 @@ DwaBaseLayerable::createLobes(const DwaBaseLayerable * const dwaBaseLayerable,
             addToonSpecularLobes(builder,
                                  toonParams,
                                  labels.mSpecular,
-                                 specularLightSet);
+                                 specularLightSet,
+                                 primaryIridescence);
 
             // Toon Specular Transmission
             if (!scene_rdl2::math::isZero(params.mTransmission)) { 

@@ -429,6 +429,13 @@ resolveToonParams(const uniform DwaBase * uniform dwaBase,
                               dwaBase->mAttrFuncs.mToonSpecularFuncs,
                               params->mToonSpecularParams,
                               dwaBase->mUParams.mToonSpecularModel);
+        // When the toon specular doesn't have its own input normal enabled, or
+        // it is enabled but no specific normal map is connected, fall back to
+        // params->mNormal
+        if (!GETBOOLATTR(dwaBase->mAttrFuncs.mToonSpecularFuncs.mGetAttrEnableInputNormal, me, false) ||
+            dwaBase->mToonSpecularData.mNormalMap == NULL) {
+            params->mToonSpecularParams.mNormal = params->mNormal;
+        }
     }
 }
 

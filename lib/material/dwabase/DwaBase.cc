@@ -1125,6 +1125,13 @@ resolveToonParams(const DwaBase* me,
                               keys.mToonSpecularKeys,
                               params.mToonSpecularParams,
                               me->getISPCBaseMaterialStruct()->mUParams.mToonSpecularModel);
+        // When the toon specular doesn't have its own input normal enabled, or
+        // it is enabled but no specific normal map is connected, fall back to
+        // params.mNormal
+        if (!me->get(keys.mToonSpecularKeys.mEnableInputNormal) ||
+            me->get(keys.mToonSpecularKeys.mInputNormal) == nullptr) {
+            asCpp(params.mToonSpecularParams.mNormal) = asCpp(params.mNormal);
+        }
     }
 }
 

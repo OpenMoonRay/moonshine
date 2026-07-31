@@ -1,0 +1,29 @@
+{
+    "name": "ContactSheetDisplayFilter",
+    "type": "DisplayFilter",
+    "directives": {
+        "include": [
+            "lib/displayfilter/json/common.json"
+        ]
+    },
+    "attributes": {
+        "attrRows": {
+            "name": "rows",
+            "type": "Int",
+            "default": "2",
+            "comment": "Number of rows in the contact sheet."
+        },
+        "attrColumns": {
+            "name": "columns",
+            "type": "Int",
+            "default": "1",
+            "comment": "Number of columns in the contact sheet."
+        },
+        "attrInputs": {
+            "name": "inputs",
+            "type": "SceneObjectVector",
+            "interface": "INTERFACE_RENDEROUTPUT | INTERFACE_DISPLAYFILTER",
+            "comment": "Inputs to contact sheet."
+        }
+    }
+}

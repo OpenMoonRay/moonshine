@@ -11,6 +11,9 @@ struct ContactSheetDisplayFilter
     float mMix;
     int   mGridSize;
     int   mNumInputs;
+    bool  mShowLabels;
+    float mFontScale;
+    const uniform InputBuffer * uniform mTextInputBuffer;
 };
 
 export const uniform ContactSheetDisplayFilter * uniform
@@ -18,7 +21,6 @@ ContactSheetDisplayFilter_get(const uniform DisplayFilter * uniform displayFilte
 {
     return DISPLAYFILTER_GET_ISPC_CPTR(ContactSheetDisplayFilter, displayFilter);
 }
-
 
 static void
 filter(const uniform DisplayFilter * uniform me,
@@ -68,6 +70,20 @@ filter(const uniform DisplayFilter * uniform me,
 
             const uniform float invArea = 1.0f / (float)(gridSize * gridSize);
             *result = accumulate * invArea;
+        }
+    }
+
+    //overlay text
+    if (self->mTextInputBuffer != NULL && self->mShowLabels)
+    {
+        const uniform InputBuffer const * uniform textBuf = self->mTextInputBuffer;
+        varying Vec4f textRgba = InputBuffer_getFloat4Pixel(textBuf, dstX, dstY);
+        varying float textAlpha = textRgba.w;
+
+        if (textAlpha > 0.0f)
+        {
+            varying Color textColor = Color_ctor(textRgba.x, textRgba.y, textRgba.z);
+            *result = lerp(*result, textColor, textAlpha);
         }
     }
 }

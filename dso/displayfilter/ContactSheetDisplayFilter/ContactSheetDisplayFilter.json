@@ -24,6 +24,35 @@
             "type": "SceneObjectVector",
             "interface": "INTERFACE_RENDEROUTPUT | INTERFACE_DISPLAYFILTER",
             "comment": "Inputs to contact sheet."
+        },
+        "attrLabels": {
+            "name": "labels",
+            "type": "StringVector",
+            "interface": "INTERFACE_GENERIC",
+            "comment": "Custom labels for each image in the contact sheet"
+        },
+        "attrFontScale": {
+            "name": "font_scale",
+            "type": "Float",
+            "default": "1.0",
+            "comment": "Font size multiplier."
+        },
+        "attrLabelColor": {
+            "name": "label_color",
+            "type": "Rgb",
+            "default": "Rgb(1.0, 1.0, 1.0)"
+        },
+        "attrFontPath": {
+            "name": "font_path",
+            "type": "String",
+            "flags": "FLAGS_FILENAME",
+            "comment": "If not a full pathname to a font file, will search for fonts in common system locations."
+        },
+        "attrShowLabels": {
+            "name": "show_labels",
+            "type": "Bool",
+            "default": "true",
+            "comment": "Show render output name as label."
         }
     }
 }

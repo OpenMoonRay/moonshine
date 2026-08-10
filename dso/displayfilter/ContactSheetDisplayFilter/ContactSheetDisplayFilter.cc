@@ -65,7 +65,6 @@ std::string getAovLabel(const SceneObject* so)
     return fullName;
 }
 
-//
 void
 ContactSheetDisplayFilter::renderLabels(int imgW, int imgH) const
 {
@@ -91,8 +90,7 @@ ContactSheetDisplayFilter::renderLabels(int imgW, int imgH) const
 
     mTextPixelBuffer->getFloat4Buffer().clear(scene_rdl2::math::Vec4f(0.0f, 0.0f, 0.0f, 0.0f));
 
-    for (int i = 0; i < mIspc.mNumInputs; ++i)
-    {
+    for (int i = 0; i < mIspc.mNumInputs; ++i) {
         int row = gridSize - i / gridSize - 1;
         int col = i % gridSize;
 
@@ -101,12 +99,10 @@ ContactSheetDisplayFilter::renderLabels(int imgW, int imgH) const
 
 
         std::string labelText;
-        if (i < userLabels.size() && !userLabels[i].empty())
-        {
+        if (i < userLabels.size() && !userLabels[i].empty()) {
             labelText = userLabels[i];
         }
-        else
-        {
+        else {
             labelText = getAovLabel(inputs[i]);
         }
 
@@ -154,8 +150,7 @@ ContactSheetDisplayFilter::getInputData(const displayfilter::InitializeData& ini
                                         displayfilter::InputData& inputData) const
 {
     inputData.mInputs = get(attrInputs);
-    for (int i = 0; i < inputData.mInputs.size(); i++)
-    {
+    for (int i = 0; i < inputData.mInputs.size(); i++) {
         inputData.mWindowWidths.push_back(0);
     }
 

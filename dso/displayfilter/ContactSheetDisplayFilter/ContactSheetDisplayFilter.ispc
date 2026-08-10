@@ -38,7 +38,7 @@ filter(const uniform DisplayFilter * uniform me,
     const varying int cellWidth =  state->mImageWidth / self->mGridSize;
     const varying int cellHeight = state->mImageHeight / self->mGridSize;
 
-    const varying int row = self->mGridSize - dstY / cellHeight - 1 ;
+    const varying int row = self->mGridSize - dstY / cellHeight - 1;
     const varying int column = dstX / cellWidth;
 
     const varying int bufferIndex = row * self->mGridSize + column;
@@ -49,21 +49,16 @@ filter(const uniform DisplayFilter * uniform me,
     const varying int srcX0 = localX * gridSize;
     const varying int srcY0 = localY * gridSize;
 
-    foreach_unique(idx in bufferIndex)
-    {
-        if (idx < 0 || idx >= self->mNumInputs || inputBuffers[idx] == NULL)
-        {
+    foreach_unique(idx in bufferIndex) {
+        if (idx < 0 || idx >= self->mNumInputs || inputBuffers[idx] == NULL) {
             *result = Color_ctor(0.0f, 0.0f, 0.0f);
         }
-        else
-        {
+        else {
             const uniform InputBuffer const * uniform src = inputBuffers[idx];
             varying Color accumulate = Color_ctor(0.0f, 0.0f, 0.0f);
 
-            for (uniform int dy = 0; dy < gridSize; ++dy)
-            {
-                for (uniform int dx = 0; dx < gridSize; ++dx)
-                {
+            for (uniform int dy = 0; dy < gridSize; ++dy) {
+                for (uniform int dx = 0; dx < gridSize; ++dx) {
                     accumulate = accumulate + InputBuffer_getPixel(src, srcX0 + dx, srcY0 + dy);
                 }
             }
@@ -74,14 +69,12 @@ filter(const uniform DisplayFilter * uniform me,
     }
 
     //overlay text
-    if (self->mTextInputBuffer != NULL && self->mShowLabels)
-    {
+    if (self->mTextInputBuffer != NULL && self->mShowLabels) {
         const uniform InputBuffer const * uniform textBuf = self->mTextInputBuffer;
         varying Vec4f textRgba = InputBuffer_getFloat4Pixel(textBuf, dstX, dstY);
         varying float textAlpha = textRgba.w;
 
-        if (textAlpha > 0.0f)
-        {
+        if (textAlpha > 0.0f) {
             varying Color textColor = Color_ctor(textRgba.x, textRgba.y, textRgba.z);
             *result = lerp(*result, textColor, textAlpha);
         }

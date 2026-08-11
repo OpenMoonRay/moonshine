@@ -692,8 +692,12 @@ void blendToonDiffuseParams(const ispc::BlendColorSpace colorSpace,
         !isZero(params1.mToonDiffuse)) {
 
         if (params0.mModel != params1.mModel) {
-            // values are mixed: Ramp wins
-            params.mModel = ispc::TOON_DIFFUSE_RAMP;
+            // Ramp wins over non-ramp; RAMP_V2 wins over RAMP
+            if (params0.mModel == ispc::TOON_DIFFUSE_RAMP_V2 || params1.mModel == ispc::TOON_DIFFUSE_RAMP_V2) {
+                params.mModel = ispc::TOON_DIFFUSE_RAMP_V2;
+            } else {
+                params.mModel = ispc::TOON_DIFFUSE_RAMP_V1;
+            }
         } else {
             params.mModel = params1.mModel;
         }
@@ -704,9 +708,11 @@ void blendToonDiffuseParams(const ispc::BlendColorSpace colorSpace,
                                                    mask));
 
         // Oren-nayer params
-        if (params0.mModel == ispc::TOON_DIFFUSE_OREN_NAYAR && params1.mModel == ispc::TOON_DIFFUSE_RAMP) {
+        if (params0.mModel == ispc::TOON_DIFFUSE_OREN_NAYAR &&
+            (params1.mModel == ispc::TOON_DIFFUSE_RAMP_V1 || params1.mModel == ispc::TOON_DIFFUSE_RAMP_V2)) {
             copyToonDiffuseOrenNayarParams(params0, params);
-        } else if (params0.mModel == ispc::TOON_DIFFUSE_RAMP && params1.mModel == ispc::TOON_DIFFUSE_OREN_NAYAR) {
+        } else if ((params0.mModel == ispc::TOON_DIFFUSE_RAMP_V1 || params0.mModel == ispc::TOON_DIFFUSE_RAMP_V2) &&
+                   params1.mModel == ispc::TOON_DIFFUSE_OREN_NAYAR) {
             copyToonDiffuseOrenNayarParams(params1, params);
         } else {
             params.mTerminatorShift = lerp(params0.mTerminatorShift,
@@ -724,9 +730,11 @@ void blendToonDiffuseParams(const ispc::BlendColorSpace colorSpace,
         params.mRampWeight = lerp(params0.mRampWeight,
                                   params1.mRampWeight,
                                   mask);
-        if (params0.mModel == ispc::TOON_DIFFUSE_OREN_NAYAR && params1.mModel == ispc::TOON_DIFFUSE_RAMP) {
+        if (params0.mModel == ispc::TOON_DIFFUSE_OREN_NAYAR &&
+            (params1.mModel == ispc::TOON_DIFFUSE_RAMP_V1 || params1.mModel == ispc::TOON_DIFFUSE_RAMP_V2)) {
             copyToonDiffuseRampParams(params1, params);
-        } else if (params0.mModel == ispc::TOON_DIFFUSE_RAMP && params1.mModel == ispc::TOON_DIFFUSE_OREN_NAYAR) {
+        } else if ((params0.mModel == ispc::TOON_DIFFUSE_RAMP_V1 || params0.mModel == ispc::TOON_DIFFUSE_RAMP_V2) &&
+                   params1.mModel == ispc::TOON_DIFFUSE_OREN_NAYAR) {
             copyToonDiffuseRampParams(params0, params);
         } else {
             params.mRampNumPoints = max(params0.mRampNumPoints,

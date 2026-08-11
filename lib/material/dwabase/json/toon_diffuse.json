@@ -18,7 +18,8 @@
             "flags": "FLAGS_ENUMERABLE",
             "enum": {
                 "oren-nayar": "0",
-                "ramp": "1"
+                "ramp": "1",
+                "ramp_v2": "2"
             },
             "enable if": {
                 "show_diffuse": "true"

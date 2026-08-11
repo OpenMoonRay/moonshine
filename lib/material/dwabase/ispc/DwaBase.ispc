@@ -285,7 +285,7 @@ resolveToonDiffuseParams(const uniform Material *uniform me,
                          varying ToonDiffuseParameters& toonDParams)
 {
     toonDParams.mToonDiffuse = 1.0f;
-    toonDParams.mModel = GETINTATTR(attrFuncs.mGetAttrModel, me, TOON_DIFFUSE_RAMP);
+    toonDParams.mModel = GETINTATTR(attrFuncs.mGetAttrModel, me, TOON_DIFFUSE_RAMP_V1);
     if (toonDParams.mModel == TOON_DIFFUSE_OREN_NAYAR) {
         toonDParams.mTerminatorShift =
             clamp(EVALFLOATATTR(attrFuncs.mEvalAttrTerminatorShift, me, tls, state, 0.0f),
@@ -309,7 +309,8 @@ resolveToonDiffuseParams(const uniform Material *uniform me,
                                &unadaptedN);
     toonDParams.mNormal = unadaptedN;
 
-    if (toonDParams.mModel == TOON_DIFFUSE_RAMP) {
+    if (toonDParams.mModel == TOON_DIFFUSE_RAMP_V1 ||
+        toonDParams.mModel == TOON_DIFFUSE_RAMP_V2) {
         toonDParams.mRampWeight = 1.0f;
 
          // Get the ramp data points and validate them

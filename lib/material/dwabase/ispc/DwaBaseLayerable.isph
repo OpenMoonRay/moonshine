@@ -76,7 +76,8 @@ enum DiffuseTransmissionBlendingBehavior {
 // Controls how diffuse is rendered when toon diffuse is active
 enum ToonDiffuseModel {
     TOON_DIFFUSE_OREN_NAYAR,
-    TOON_DIFFUSE_RAMP
+    TOON_DIFFUSE_RAMP_V1,
+    TOON_DIFFUSE_RAMP_V2   // fixed 1/pi normalization (MOONSHINE-2051)
 };
 
 // Controls how specular is rendered when toon specular is active

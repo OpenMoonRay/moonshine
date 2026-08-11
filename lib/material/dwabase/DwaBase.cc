@@ -1022,7 +1022,8 @@ resolveToonDiffuseParams(const DwaBase* me,
                    &unadaptedN);
     asCpp(toonDParams.mNormal) = unadaptedN;
 
-    if (toonDParams.mModel == ispc::TOON_DIFFUSE_RAMP) {
+    if (toonDParams.mModel == ispc::TOON_DIFFUSE_RAMP_V1 ||
+        toonDParams.mModel == ispc::TOON_DIFFUSE_RAMP_V2) {
 
         toonDParams.mRampWeight = 1.0f;
 

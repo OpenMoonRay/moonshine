@@ -1114,10 +1114,15 @@ DWABASE_createLobes(const uniform Material * uniform me,
     if (!blackAlbedo) {
         // If there is any SSS, toon diffuse is totally ignored
         // otherwise, toon ramp is applied before other diffuse models
+        const varying int toonModel = params->mToonDiffuseParams.mModel;
+        const varying bool isToonRamp = (toonModel == TOON_DIFFUSE_RAMP_V1 ||
+                                         toonModel == TOON_DIFFUSE_RAMP_V2);
         if (zeroScatterRadius && !isZero(params->mToonDiffuseParams.mToonDiffuse) &&
-            params->mToonDiffuseParams.mModel == TOON_DIFFUSE_RAMP) {
+            isToonRamp) {
 
             ToonBRDF toon;
+            // "ramp" (v1) preserves legacy 1/(2*pi) normalization; "ramp_v2" (v2) uses corrected 1/pi.
+            const varying int version = (toonModel == TOON_DIFFUSE_RAMP_V1) ? 1 : 2;
             ToonBRDF_init(toon,
                           params->mToonDiffuseParams.mNormal,
                           reflectionAlbedo,
@@ -1126,7 +1131,8 @@ DWABASE_createLobes(const uniform Material * uniform me,
                           params->mToonDiffuseParams.mRampPositions,
                           params->mToonDiffuseParams.mRampInterpolators,
                           params->mToonDiffuseParams.mRampColors,
-                          params->mToonDiffuseParams.mExtendRamp);
+                          params->mToonDiffuseParams.mExtendRamp,
+                          version);
 
             BsdfBuilder_addToonBRDF(bsdfBuilder,
                                     toon,
@@ -1616,7 +1622,8 @@ DWABASE_applyColorCorrectParameters(uniform ShadingTLState * uniform tls,
 
         // handle toon ramp, if present
         if (!isZero(params->mToonDiffuseParams.mToonDiffuse) &&
-            params->mToonDiffuseParams.mModel == TOON_DIFFUSE_RAMP) {
+            (params->mToonDiffuseParams.mModel == TOON_DIFFUSE_RAMP_V1 ||
+             params->mToonDiffuseParams.mModel == TOON_DIFFUSE_RAMP_V2)) {
             const int rampPts = params->mToonDiffuseParams.mRampNumPoints;
             for (int i = 0; i < rampPts; ++i) {
                 Color c = params->mToonDiffuseParams.mRampColors[i];

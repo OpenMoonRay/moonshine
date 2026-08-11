@@ -543,13 +543,18 @@ DwaBaseLayerable::createLobes(const DwaBaseLayerable * const dwaBaseLayerable,
     if (!blackAlbedo) {
         // If there is any SSS, toon diffuse is totally ignored
         // otherwise, toon ramp is applied before other diffuse models
+        const int toonModel = params.mToonDiffuseParams.mModel;
+        const bool isToonRamp = (toonModel == ispc::TOON_DIFFUSE_RAMP_V1 ||
+                                 toonModel == ispc::TOON_DIFFUSE_RAMP_V2);
         if (zeroScatterRadius && !scene_rdl2::math::isZero(params.mToonDiffuseParams.mToonDiffuse)
-            && params.mToonDiffuseParams.mModel == ispc::TOON_DIFFUSE_RAMP) {
+            && isToonRamp) {
             const ispc::ToonDiffuseParameters &toonDParams = params.mToonDiffuseParams;
             const scene_rdl2::math::Vec3f& toonN = scene_rdl2::math::asCpp(toonDParams.mNormal);
 
             // Cast to CPP Type
             const scene_rdl2::math::Color* rampColors = reinterpret_cast<const scene_rdl2::math::Color*>(toonDParams.mRampColors);
+            // "ramp" (v1) preserves legacy 1/(2*pi) normalization; "ramp_v2" (v2) uses corrected 1/pi.
+            const int version = (toonModel == ispc::TOON_DIFFUSE_RAMP_V1) ? 1 : 2;
             const moonray::shading::ToonBRDF toon(toonN,
                                                   reflectionAlbedo,
                                                   toonDParams.mRampInputScale,
@@ -557,7 +562,8 @@ DwaBaseLayerable::createLobes(const DwaBaseLayerable * const dwaBaseLayerable,
                                                   toonDParams.mRampPositions,
                                                   toonDParams.mRampInterpolators,
                                                   rampColors,
-                                                  toonDParams.mExtendRamp);
+                                                  toonDParams.mExtendRamp,
+                                                  version);
 
             builder.addToonBRDF(toon,
                                 params.mFabricAttenuation * toonDParams.mToonDiffuse * toonDParams.mRampWeight,
@@ -758,7 +764,8 @@ DwaBaseLayerable::applyColorCorrectParameters(moonray::shading::TLState *tls,
 
         // handle toon ramp, if present
         if (!isZero(params.mToonDiffuseParams.mToonDiffuse) && 
-            params.mToonDiffuseParams.mModel == ispc::TOON_DIFFUSE_RAMP) {
+            (params.mToonDiffuseParams.mModel == ispc::TOON_DIFFUSE_RAMP_V1 ||
+             params.mToonDiffuseParams.mModel == ispc::TOON_DIFFUSE_RAMP_V2)) {
             const int rampPts = params.mToonDiffuseParams.mRampNumPoints;
             for (int i = 0; i < rampPts; ++i) {
                 Color c = asCpp(params.mToonDiffuseParams.mRampColors[i]);

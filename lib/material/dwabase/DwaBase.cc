@@ -651,7 +651,7 @@ DwaBase::update()
             // don't want to clear mRequiredAttributes in case glitter still requires refPKey
             std::vector<int>::iterator it = std::find(mRequiredAttributes.begin(),
                                                       mRequiredAttributes.end(),
-                                                      moonray::shading::StandardAttributes::sScatterTag);
+                                                      moonray::shading::StandardAttributes::sScatterTag.getIndex());
             if (it != mRequiredAttributes.end() &&
                     isEqual(get(mAttrKeys.mHairGlintMinTwists), get(mAttrKeys.mHairGlintMaxTwists))) {
                 // key found but no glint variation, so erase key
@@ -659,7 +659,7 @@ DwaBase::update()
             } else if (it == mRequiredAttributes.end() &&
                     !isEqual(get(mAttrKeys.mHairGlintMinTwists), get(mAttrKeys.mHairGlintMaxTwists))) {
                 // key not found and glint variation is present, so add key
-                mRequiredAttributes.push_back(moonray::shading::StandardAttributes::sScatterTag);
+                mRequiredAttributes.push_back(moonray::shading::StandardAttributes::sScatterTag.getIndex());
             }
         }
     }
@@ -1779,4 +1779,3 @@ DwaBase::resolvePreventLightCulling(const State& state) const
 
 } // namespace dwabase
 } // namespace moonshine
-

@@ -27,7 +27,7 @@ sampleNormal(const uniform NormalMap *uniform map,
     const uniform SwitchNormalMap * uniform me = NORMALMAP_GET_ISPC_PTR(SwitchNormalMap, map);
     varying Vec3f norm = state.mN;
 
-    varying int choice = max(0, (varying int) evalAttrChoice(map, tls, state));
+    varying int choice = max(0, (varying int) round(evalAttrChoice(map, tls, state)));
     choice = choice % SN_MAX_INPUTS;
 
     foreach_unique(val in choice) {

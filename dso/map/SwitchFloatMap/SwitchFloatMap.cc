@@ -7,6 +7,8 @@
 
 #include <moonray/rendering/shading/MapApi.h>
 
+#include <cmath>
+
 using namespace scene_rdl2::math;
 using namespace moonray::shading;
 
@@ -120,8 +122,7 @@ SwitchFloatMap::sample(const scene_rdl2::rdl2::Map* self, moonray::shading::TLSt
                  const moonray::shading::State& state, Color* sample)
 {
     const SwitchFloatMap* me = static_cast<const SwitchFloatMap*>(self);
-    unsigned int choice =
-            static_cast<unsigned int>(evalFloat(me, attrChoice, tls, state));
+    int choice = std::max(0, static_cast<int>(std::round(evalFloat(me, attrChoice, tls, state))));
     // cycle through max choices allowed
     choice = choice % 64;
     float result = evalFloat(me, me->mInputAttrs[choice], tls, state);

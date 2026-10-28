@@ -37,7 +37,8 @@ ISPC_UTIL_EXPORT_ENUM_TO_HEADER(PrimeSource);
 
 enum ClampBehavior {
     DIRECTIONAL_BEHAVIOR_CLAMP = 0,
-    DIRECTIONAL_BEHAVIOR_ABS   = 1
+    DIRECTIONAL_BEHAVIOR_ABS   = 1,
+    DIRECTIONAL_BEHAVIOR_UNCLAMPED = 2
 };
 ISPC_UTIL_EXPORT_ENUM_TO_HEADER(ClampBehavior);
 
@@ -182,8 +183,16 @@ sample(const uniform Map *uniform map,
     }
 
     varying float cosTheta = dot(N, prime);
-    if (getAttrClamping(map) == DIRECTIONAL_BEHAVIOR_ABS) {
-        cosTheta = abs(cosTheta);
+    switch (getAttrClamping(map)) {
+        case DIRECTIONAL_BEHAVIOR_ABS :
+            cosTheta = abs(cosTheta);
+            break;
+        case DIRECTIONAL_BEHAVIOR_UNCLAMPED :
+            cosTheta = (cosTheta + 1.0f) * 0.5f;
+            break;
+        case DIRECTIONAL_BEHAVIOR_CLAMP :
+        default :
+            break;
     }
     cosTheta = saturate(cosTheta);
 
@@ -195,6 +204,8 @@ sample(const uniform Map *uniform map,
     varying float falloff;
     if (falloffType == DIRECTIONAL_FALLOFF_COSINE) {
         falloff = cosTheta;
+    } else if (getAttrClamping(map) == DIRECTIONAL_BEHAVIOR_UNCLAMPED) {
+        falloff = 1.0f - dw_acos(cosTheta * 2.0f - 1.0f) /sPi;
     } else {    // DIRECTIONAL_FALLOFF_LINEAR
         falloff = 1.0f - dw_acos(cosTheta) / sHalfPi;
     }

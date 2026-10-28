@@ -204,8 +204,16 @@ DirectionalMap::sample(const Map* self, moonray::shading::TLState *tls,
     }
 
     float cosTheta = dot(N, prime);
-    if (me->get(attrClamping) == ispc::DIRECTIONAL_BEHAVIOR_ABS) {
-        cosTheta = scene_rdl2::math::abs(cosTheta);
+    switch (me->get(attrClamping)) {
+        case ispc::DIRECTIONAL_BEHAVIOR_ABS :
+            cosTheta = scene_rdl2::math::abs(cosTheta);
+            break;
+        case ispc::DIRECTIONAL_BEHAVIOR_UNCLAMPED :
+            cosTheta = 0.5f * (cosTheta + 1.0f);
+            break;
+        case ispc::DIRECTIONAL_BEHAVIOR_CLAMP :
+        default :
+            break;
     }
     cosTheta = saturate(cosTheta);
 
@@ -217,6 +225,8 @@ DirectionalMap::sample(const Map* self, moonray::shading::TLState *tls,
     float falloff;
     if (falloffType == ispc::DIRECTIONAL_FALLOFF_COSINE) {
         falloff = cosTheta;
+    } else if (me->get(attrClamping) == ispc::DIRECTIONAL_BEHAVIOR_UNCLAMPED) {
+        falloff = 1.0f - scene_rdl2::math::acos(2.0f * cosTheta - 1.0f) / sPi;
     } else {    // ispc::DIRECTIONAL_FALLOFF_LINEAR
         falloff = 1.0f - scene_rdl2::math::acos(cosTheta) / sHalfPi;
     }

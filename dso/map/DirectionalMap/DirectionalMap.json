@@ -118,7 +118,8 @@
             "flags": "FLAGS_ENUMERABLE",
             "enum" : {
                 "clamp" : "0",
-                "absolute" : "1"
+                "absolute" : "1",
+                "unclamped" : "2"
             }
         },
         "attrBias": {

@@ -448,7 +448,8 @@ void
 DWABASE_addToonSpecularLobes(varying BsdfBuilder &bsdfBuilder,
                              const varying ToonSpecularParameters& params,
                              const uniform int label,
-                             const uniform LightSet * uniform lightSet)
+                             const uniform LightSet * uniform lightSet,
+                             varying Iridescence * uniform iridescence)
 {
     ToonSpecularBRDF toonSpecularBRDF;
     ToonSpecularBRDF_init(toonSpecularBRDF,
@@ -467,7 +468,8 @@ DWABASE_addToonSpecularLobes(varying BsdfBuilder &bsdfBuilder,
                           params.mdPdt,
                           params.mEnableIndirectReflections,
                           params.mIndirectReflectionsIntensity,
-                          params.mIndirectReflectionsRoughness);
+                          params.mIndirectReflectionsRoughness,
+                          iridescence);
 
     BsdfBuilder_addToonSpecularBRDF(bsdfBuilder,
                                     toonSpecularBRDF,
@@ -481,7 +483,8 @@ void
 DWABASE_addHairToonSpecularLobes(varying BsdfBuilder &bsdfBuilder,
                                  const varying ToonSpecularParameters& params,
                                  const uniform DwaBaseLabels * uniform labels,
-                                 const uniform LightSet * uniform lightSet)
+                                 const uniform LightSet * uniform lightSet,
+                                 varying Iridescence * uniform iridescence)
 {
     HairToonSpecularBRDF hairToonSpecularBRDF;
     HairToonSpecularBRDF_init(hairToonSpecularBRDF,
@@ -501,7 +504,8 @@ DWABASE_addHairToonSpecularLobes(varying BsdfBuilder &bsdfBuilder,
                               params.mRampValues,
                               params.mEnableIndirectReflections,
                               params.mIndirectReflectionsIntensity,
-                              params.mIndirectReflectionsRoughness);
+                              params.mIndirectReflectionsRoughness,
+                              iridescence);
 
     BsdfBuilder_addHairToonSpecularBRDF(bsdfBuilder,
                                         hairToonSpecularBRDF,
@@ -800,12 +804,14 @@ DWABASE_createLobes(const uniform Material * uniform me,
             DWABASE_addToonSpecularLobes(bsdfBuilder,
                                          params->mHairToonS1Params,
                                          labels->mHairLabels.mHair,
-                                         params->mSpecularLightSet);
+                                         params->mSpecularLightSet,
+                                         primaryIridescence);
         } else if (uParams->mHairToonS1Model == ToonSpecularHair) {
             DWABASE_addHairToonSpecularLobes(bsdfBuilder,
                                              params->mHairToonS1Params,
                                              labels,
-                                             params->mSpecularLightSet);
+                                             params->mSpecularLightSet,
+                                             primaryIridescence);
         }
     }
 
@@ -814,12 +820,14 @@ DWABASE_createLobes(const uniform Material * uniform me,
             DWABASE_addToonSpecularLobes(bsdfBuilder,
                                          params->mHairToonS2Params,
                                          labels->mHairLabels.mHair,
-                                         params->mSpecularLightSet);
+                                         params->mSpecularLightSet,
+                                         primaryIridescence);
         } else if (uParams->mHairToonS2Model == ToonSpecularHair) {
             DWABASE_addHairToonSpecularLobes(bsdfBuilder,
                                              params->mHairToonS2Params,
                                              labels,
-                                             params->mSpecularLightSet);
+                                             params->mSpecularLightSet,
+                                             primaryIridescence);
         }
     }
 
@@ -828,12 +836,14 @@ DWABASE_createLobes(const uniform Material * uniform me,
             DWABASE_addToonSpecularLobes(bsdfBuilder,
                                          params->mHairToonS3Params,
                                          labels->mHairLabels.mHair,
-                                         params->mSpecularLightSet);
+                                         params->mSpecularLightSet,
+                                         primaryIridescence);
         } else if (uParams->mHairToonS3Model == ToonSpecularHair) {
             DWABASE_addHairToonSpecularLobes(bsdfBuilder,
                                              params->mHairToonS3Params,
                                              labels,
-                                             params->mSpecularLightSet);
+                                             params->mSpecularLightSet,
+                                             primaryIridescence);
         }
     }
 
@@ -954,7 +964,8 @@ DWABASE_createLobes(const uniform Material * uniform me,
             DWABASE_addToonSpecularLobes(bsdfBuilder,
                                          toonParams,
                                          labels->mSpecular,
-                                         params->mSpecularLightSet);
+                                         params->mSpecularLightSet,
+                                         primaryIridescence);
 
             // Toon Specular Transmission
             if (!isZero(params->mTransmission)) { 
@@ -1103,10 +1114,15 @@ DWABASE_createLobes(const uniform Material * uniform me,
     if (!blackAlbedo) {
         // If there is any SSS, toon diffuse is totally ignored
         // otherwise, toon ramp is applied before other diffuse models
+        const varying int toonModel = params->mToonDiffuseParams.mModel;
+        const varying bool isToonRamp = (toonModel == TOON_DIFFUSE_RAMP_V1 ||
+                                         toonModel == TOON_DIFFUSE_RAMP_V2);
         if (zeroScatterRadius && !isZero(params->mToonDiffuseParams.mToonDiffuse) &&
-            params->mToonDiffuseParams.mModel == TOON_DIFFUSE_RAMP) {
+            isToonRamp) {
 
             ToonBRDF toon;
+            // "ramp" (v1) preserves legacy 1/(2*pi) normalization; "ramp_v2" (v2) uses corrected 1/pi.
+            const varying int version = (toonModel == TOON_DIFFUSE_RAMP_V1) ? 1 : 2;
             ToonBRDF_init(toon,
                           params->mToonDiffuseParams.mNormal,
                           reflectionAlbedo,
@@ -1115,7 +1131,8 @@ DWABASE_createLobes(const uniform Material * uniform me,
                           params->mToonDiffuseParams.mRampPositions,
                           params->mToonDiffuseParams.mRampInterpolators,
                           params->mToonDiffuseParams.mRampColors,
-                          params->mToonDiffuseParams.mExtendRamp);
+                          params->mToonDiffuseParams.mExtendRamp,
+                          version);
 
             BsdfBuilder_addToonBRDF(bsdfBuilder,
                                     toon,
@@ -1605,7 +1622,8 @@ DWABASE_applyColorCorrectParameters(uniform ShadingTLState * uniform tls,
 
         // handle toon ramp, if present
         if (!isZero(params->mToonDiffuseParams.mToonDiffuse) &&
-            params->mToonDiffuseParams.mModel == TOON_DIFFUSE_RAMP) {
+            (params->mToonDiffuseParams.mModel == TOON_DIFFUSE_RAMP_V1 ||
+             params->mToonDiffuseParams.mModel == TOON_DIFFUSE_RAMP_V2)) {
             const int rampPts = params->mToonDiffuseParams.mRampNumPoints;
             for (int i = 0; i < rampPts; ++i) {
                 Color c = params->mToonDiffuseParams.mRampColors[i];

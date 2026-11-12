@@ -651,7 +651,7 @@ DwaBase::update()
             // don't want to clear mRequiredAttributes in case glitter still requires refPKey
             std::vector<int>::iterator it = std::find(mRequiredAttributes.begin(),
                                                       mRequiredAttributes.end(),
-                                                      moonray::shading::StandardAttributes::sScatterTag);
+                                                      moonray::shading::StandardAttributes::sScatterTag.getIndex());
             if (it != mRequiredAttributes.end() &&
                     isEqual(get(mAttrKeys.mHairGlintMinTwists), get(mAttrKeys.mHairGlintMaxTwists))) {
                 // key found but no glint variation, so erase key
@@ -659,7 +659,7 @@ DwaBase::update()
             } else if (it == mRequiredAttributes.end() &&
                     !isEqual(get(mAttrKeys.mHairGlintMinTwists), get(mAttrKeys.mHairGlintMaxTwists))) {
                 // key not found and glint variation is present, so add key
-                mRequiredAttributes.push_back(moonray::shading::StandardAttributes::sScatterTag);
+                mRequiredAttributes.push_back(moonray::shading::StandardAttributes::sScatterTag.getIndex());
             }
         }
     }
@@ -1022,7 +1022,8 @@ resolveToonDiffuseParams(const DwaBase* me,
                    &unadaptedN);
     asCpp(toonDParams.mNormal) = unadaptedN;
 
-    if (toonDParams.mModel == ispc::TOON_DIFFUSE_RAMP) {
+    if (toonDParams.mModel == ispc::TOON_DIFFUSE_RAMP_V1 ||
+        toonDParams.mModel == ispc::TOON_DIFFUSE_RAMP_V2) {
 
         toonDParams.mRampWeight = 1.0f;
 
@@ -1125,6 +1126,13 @@ resolveToonParams(const DwaBase* me,
                               keys.mToonSpecularKeys,
                               params.mToonSpecularParams,
                               me->getISPCBaseMaterialStruct()->mUParams.mToonSpecularModel);
+        // When the toon specular doesn't have its own input normal enabled, or
+        // it is enabled but no specific normal map is connected, fall back to
+        // params.mNormal
+        if (!me->get(keys.mToonSpecularKeys.mEnableInputNormal) ||
+            me->get(keys.mToonSpecularKeys.mInputNormal) == nullptr) {
+            asCpp(params.mToonSpecularParams.mNormal) = asCpp(params.mNormal);
+        }
     }
 }
 
@@ -1771,4 +1779,3 @@ DwaBase::resolvePreventLightCulling(const State& state) const
 
 } // namespace dwabase
 } // namespace moonshine
-

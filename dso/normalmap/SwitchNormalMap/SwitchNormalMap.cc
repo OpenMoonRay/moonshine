@@ -7,6 +7,8 @@
 
 #include <moonray/rendering/shading/MapApi.h>
 
+#include <cmath>
+
 using namespace scene_rdl2::math;
 using namespace moonray::shading;
 
@@ -139,7 +141,7 @@ SwitchNormalMap::sampleNormal(const NormalMap* self,
                               Vec3f* sample)
 {
     const SwitchNormalMap* me = static_cast<const SwitchNormalMap*>(self);
-    int choice = std::max(0, static_cast<int>(evalFloat(me, attrChoice, tls, state)));
+    int choice = std::max(0, static_cast<int>(std::round(evalFloat(me, attrChoice, tls, state))));
     // cycle through max choices allowed
     choice = choice % ispc::SN_MAX_INPUTS;
 

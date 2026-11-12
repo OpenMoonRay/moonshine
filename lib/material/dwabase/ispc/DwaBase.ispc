@@ -285,7 +285,7 @@ resolveToonDiffuseParams(const uniform Material *uniform me,
                          varying ToonDiffuseParameters& toonDParams)
 {
     toonDParams.mToonDiffuse = 1.0f;
-    toonDParams.mModel = GETINTATTR(attrFuncs.mGetAttrModel, me, TOON_DIFFUSE_RAMP);
+    toonDParams.mModel = GETINTATTR(attrFuncs.mGetAttrModel, me, TOON_DIFFUSE_RAMP_V1);
     if (toonDParams.mModel == TOON_DIFFUSE_OREN_NAYAR) {
         toonDParams.mTerminatorShift =
             clamp(EVALFLOATATTR(attrFuncs.mEvalAttrTerminatorShift, me, tls, state, 0.0f),
@@ -309,7 +309,8 @@ resolveToonDiffuseParams(const uniform Material *uniform me,
                                &unadaptedN);
     toonDParams.mNormal = unadaptedN;
 
-    if (toonDParams.mModel == TOON_DIFFUSE_RAMP) {
+    if (toonDParams.mModel == TOON_DIFFUSE_RAMP_V1 ||
+        toonDParams.mModel == TOON_DIFFUSE_RAMP_V2) {
         toonDParams.mRampWeight = 1.0f;
 
          // Get the ramp data points and validate them
@@ -429,6 +430,13 @@ resolveToonParams(const uniform DwaBase * uniform dwaBase,
                               dwaBase->mAttrFuncs.mToonSpecularFuncs,
                               params->mToonSpecularParams,
                               dwaBase->mUParams.mToonSpecularModel);
+        // When the toon specular doesn't have its own input normal enabled, or
+        // it is enabled but no specific normal map is connected, fall back to
+        // params->mNormal
+        if (!GETBOOLATTR(dwaBase->mAttrFuncs.mToonSpecularFuncs.mGetAttrEnableInputNormal, me, false) ||
+            dwaBase->mToonSpecularData.mNormalMap == NULL) {
+            params->mToonSpecularParams.mNormal = params->mNormal;
+        }
     }
 }
 

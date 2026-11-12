@@ -18,7 +18,8 @@
             "flags": "FLAGS_ENUMERABLE",
             "enum": {
                 "oren-nayar": "0",
-                "ramp": "1"
+                "ramp": "1",
+                "ramp_v2": "2"
             },
             "enable if": {
                 "show_diffuse": "true"
@@ -106,11 +107,7 @@
             "comment": "Extends the last ramp color to unlit portions. IMPORTANT: Only works in conjuction with prevent_light_culling ON and visible_shadows OFF",
             "type": "Bool",
             "default": "false",
-            "enable if": {
-                "diffuse_model": "1",
-                "show_diffuse": "true",
-                "prevent_light_culling": "true"
-            },
+            "disable when": "{ diffuse_model == oren-nayar } { show_diffuse != 1 } { prevent_light_culling != 1 }",
             "group": "Diffuse"
         },
         "attrToonRampInputScale" : {
@@ -120,11 +117,7 @@
             "type": "Float",
             "default": "1.0f",
             "flags": "FLAGS_BINDABLE",
-            "enable if": {
-                "diffuse_model": "1",
-                "show_diffuse": "true",
-                "prevent_light_culling": "true"
-            },
+            "disable when": "{ diffuse_model == oren-nayar } { show_diffuse != 1 } { prevent_light_culling != 1 }",
             "group": "Diffuse"
         },
         "attrToonDRampPositions": {
@@ -135,10 +128,7 @@
             "structure_type": "ramp_color",
             "structure_name": "ramp",
             "structure_path": "positions",
-            "enable if": {
-                "diffuse_model": "1",
-                "show_diffuse": "true"
-            },
+            "disable when": "{ diffuse_model == oren-nayar } { show_diffuse != 1 }",
             "group": "Diffuse"
         },
         "attrToonDRampColors": {
@@ -149,10 +139,7 @@
             "structure_type": "ramp_color",
             "structure_name": "ramp",
             "structure_path": "values",
-            "enable if": {
-                "diffuse_model": "1",
-                "show_diffuse": "true"
-            },
+            "disable when": "{ diffuse_model == oren-nayar } { show_diffuse != 1 }",
             "group": "Diffuse"
         },
         "attrToonDRampInterpolators": {
@@ -163,10 +150,7 @@
             "structure_type": "ramp_color",
             "structure_name": "ramp",
             "structure_path": "interpolation_types",
-            "enable if": {
-                "diffuse_model": "1",
-                "show_diffuse": "true"
-            },
+            "disable when": "{ diffuse_model == oren-nayar } { show_diffuse != 1 }",
             "group": "Diffuse"
         },
         "attrToonDRampColorMultiplier": {
@@ -177,10 +161,7 @@
             "comment": "Bindable multiplier on the ramp color",
             "default": "Rgb(1.0f, 1.0f, 1.0f)",
             "multi": "10",
-            "enable if": {
-                "diffuse_model": "1",
-                "show_diffuse": "true"
-            },
+            "disable when": "{ diffuse_model == oren-nayar } { show_diffuse != 1 }",
             "group": "Diffuse",
             "subgroup": "Ramp Color Multipliers"
         },
@@ -192,10 +173,7 @@
             "comment": "Bindable offset to the ramp-position, add a small variation using noise etc for art-directable ramp thresholds",
             "flags": "FLAGS_BINDABLE",
             "multi": "10",
-            "enable if": {
-                "diffuse_model": "1",
-                "show_diffuse": "true"
-            },
+            "disable when": "{ diffuse_model == oren-nayar } { show_diffuse != 1 }",
             "group": "Diffuse",
             "subgroup": "Ramp Position Offsets"
         }
